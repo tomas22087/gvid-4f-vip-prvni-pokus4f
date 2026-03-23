@@ -1,0 +1,33 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: pozdrav
+      id: pozdrav
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: pozdrav
+        setup-command: gcc **/main.c -o program
+        command: "./program"
+        input: ''
+        expected-output: hello world
+        comparison-method: contains
+        timeout: 1
+        max-score: 98
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        POZDRAV_RESULTS: "${{steps.pozdrav.outputs.result}}"
+      with:
+        runners: pozdrav
